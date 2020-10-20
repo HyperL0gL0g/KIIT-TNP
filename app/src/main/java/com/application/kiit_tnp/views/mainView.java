@@ -1,12 +1,15 @@
 package com.application.kiit_tnp.views;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,6 +27,13 @@ public class mainView extends AppCompatActivity {
     List<dataObj> mdata;
     RecyclerView recyclerView;
     TextView null_data;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //startActivity(new Intent(getApplicationContext(),mainView.class));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,5 +66,7 @@ public class mainView extends AppCompatActivity {
 
         rvAdapter adapter = new rvAdapter(this, mdata,this);
         recyclerView.setAdapter(adapter);
+
+
     }
 }

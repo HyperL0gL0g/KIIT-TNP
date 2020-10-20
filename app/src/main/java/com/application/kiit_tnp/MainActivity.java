@@ -2,6 +2,7 @@ package com.application.kiit_tnp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -27,6 +28,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    Activity activity = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
                         Cursor credsCursor = dbread.rawQuery("select * from users",null);
                         if(credsCursor.getCount()==1) {
                             new helpers().updateAuth(creds,dbwrite);
-                            new asyTask.login(getApplicationContext()).execute(creds);
+                            new asyTask.login(getApplicationContext(),activity).execute(creds);
+
                         }else{
                             new helpers().insertAuth(creds,dbwrite);
-                            new asyTask.login(getApplicationContext()).execute(creds);
+                            new asyTask.login(getApplicationContext(),activity).execute(creds);
+
                         }
 
                     } catch (UnsupportedEncodingException e) {

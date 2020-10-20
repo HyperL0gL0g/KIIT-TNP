@@ -2,13 +2,29 @@ package com.application.kiit_tnp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import java.io.File;
+
 public class helpers {
+
+    private static final int REQUEST_PERMISSION = 1;
+    private static String[] PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
+
+
 
     public void insertAuth(String auth,SQLiteDatabase database){
         ContentValues values = new ContentValues();
@@ -54,20 +70,58 @@ public class helpers {
         }
     }
 
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
+    public  boolean verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permissionWrite = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionRead = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if ((permissionWrite != PackageManager.PERMISSION_GRANTED) ||
+                (permissionRead != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(
                     activity,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    1
+                    PERMISSIONS,
+                    REQUEST_PERMISSION
             );
+            return false;
+        }else{
+            return true;
         }
     }
 
+
+    public void checkDownload(Activity activity,String[] data,String filename){
+        String url = "https://apiv3.kiittnp.in/api/1.2/connect/notice/downlaod";
+        Uri downloaduri = Uri.parse(url);
+        DownloadManager manager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
+
+        try {
+            if(manager!=null){
+                DownloadManager.Request request = new DownloadManager.Request(downloaduri);
+                request.addRequestHeader("rollno",data[0])
+                        .addRequestHeader("sessionid1",data[1])
+                        .addRequestHeader("sessionid2",data[2])
+                        .addRequestHeader("sessionid3",data[3])
+                        .addRequestHeader("sessionid4",data[4])
+                        .addRequestHeader("notice_id", data[5])
+                        .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
+                        .setTitle(filename)
+                        .setDescription("downloading")
+                        .setAllowedOverMetered(true)
+                        .setAllowedOverRoaming(true)
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+
+                        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,filename)
+                        .setMimeType("application/pdf");
+
+                manager.enqueue(request);
+                Toast.makeText(activity, "uccessfull", Toast.LENGTH_SHORT).show();
+            }
+        }catch (Exception e){
+            Log.d("adad",e.getMessage());
+            Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
 

@@ -57,16 +57,15 @@ public class rvAdapter extends RecyclerView.Adapter<rvAdapter.viewHolder>{
             @Override
             public void onClick(View view) {
                 Toast.makeText(context,"Starting download", Toast.LENGTH_SHORT).show();
-                asyTask a = new asyTask();
-                new helpers().verifyStoragePermissions(activity);
-                SQLiteDatabase dbread = new dbHelper(context).getReadableDatabase();
-                Cursor c = dbread.rawQuery("select * from sessionID",null);
-                if (c.moveToFirst()) {
+                if (new helpers().verifyStoragePermissions(activity)){
+                    SQLiteDatabase dbread = new dbHelper(context).getReadableDatabase();
+                    Cursor c = dbread.rawQuery("select * from sessionID",null);
+                    if (c.moveToFirst()) {
                         //mdata.add(new dataObj("Posted on "+c.getString(1),"Expires on "+c.getString(2),c.getString(3),c.getString(0)));
-                    new asyTask.getNoticeDown().execute(new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()});
+                        new asyTask.getNoticeDown(activity).execute(new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()});
+                        //new helpers().checkDownload(activity,new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()},mdata.get(position).getNoticeID());
+                    }
                 }
-                //new asyTask.getNoticeDown().execute({mdata.get(position)});
-
             }
         });
     }

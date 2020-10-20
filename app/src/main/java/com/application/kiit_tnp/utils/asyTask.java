@@ -1,14 +1,20 @@
 package com.application.kiit_tnp.utils;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
+import com.application.kiit_tnp.BuildConfig;
 import com.application.kiit_tnp.HTTPManager;
 import com.application.kiit_tnp.db.dbHelper;
 import com.application.kiit_tnp.helpers;
@@ -19,7 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,9 +37,10 @@ public class asyTask {
     public static class login extends AsyncTask<String,Void, JSONObject> {
         HTTPManager httpManager = new HTTPManager();
         Context context;
+        Activity activity;
 
-        public login(Context context) {
-            this.context = context;
+        public login(Context context,Activity activity) {
+            this.context = context;this.activity = activity;
         }
 
         @Override
@@ -70,7 +76,7 @@ public class asyTask {
                     c.close();
                     Cursor sessCursor = dbread.rawQuery("select * from sessionID",null);
                     if (sessCursor.moveToFirst()) {
-                        new get_notice(context).execute(sessCursor.getString(5),sessCursor.getString(1),sessCursor.getString(2),sessCursor.getString(3),sessCursor.getString(4),"JUNK");
+                        new get_notice(context,activity).execute(sessCursor.getString(5),sessCursor.getString(1),sessCursor.getString(2),sessCursor.getString(3),sessCursor.getString(4),"JUNK");
                     }
                     sessCursor.close();
                 }else{
@@ -86,9 +92,11 @@ public class asyTask {
 
         HTTPManager httpManager = new HTTPManager();
         Context context;
+        Activity activity;
 
-        public get_notice(Context context) {
+        public get_notice(Context context,Activity activity) {
             this.context = context;
+            this.activity = activity;
         }
 
         @Override
@@ -98,7 +106,7 @@ public class asyTask {
                 Cursor credsCursor = new dbHelper(context).getReadableDatabase().rawQuery("select * from users",null);
                 if(credsCursor.getCount()==1){
                     if (credsCursor.moveToFirst()) {
-                        new asyTask.login(context).execute(credsCursor.getString(1));
+                        new asyTask.login(context,activity).execute(credsCursor.getString(1));
                     }
                 }
             }else{
@@ -114,7 +122,10 @@ public class asyTask {
                         e.printStackTrace();
                     }
                 }
-                context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_HISTORY));
+
+                context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                activity.finish();
+                //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_HISTORY)
             }
         }
 
@@ -140,6 +151,10 @@ public class asyTask {
     public static class getNoticeDown extends AsyncTask<String,Void,Response>{
 
         HTTPManager httpManager = new HTTPManager();
+        Activity activity;
+        public getNoticeDown(Activity activity) {
+            this.activity = activity;
+        }
 
         @Override
         protected Response doInBackground(String... strings) {
@@ -159,24 +174,32 @@ public class asyTask {
             String fileName = response.header("content-disposition").split("=")[1];
             Log.d("Adad", fileName);
             try {
-                File file = new File(Environment.getExternalStorageDirectory(), fileName);
-                try (OutputStream output = new FileOutputStream(file)) {
-                    byte[] buffer = new byte[4 * 1024];
-                    int read;
-                    while ((read = input.read(buffer)) != -1) {
+                File mFolder = new File(Environment.getExternalStorageDirectory() + File.separator + "KIIT-TNP");
+                if (!mFolder.exists()) {
+                    mFolder.mkdir();
+                }
+                File file = new File(mFolder,fileName);
+                Log.d("fileData",file.getAbsolutePath());
+                FileOutputStream output = new FileOutputStream(file);
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = input.read(buffer)) != -1) {
                         output.write(buffer, 0, read);
                     }
-                    output.flush();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                output.flush();
+                Intent target = new Intent(Intent.ACTION_VIEW);
+                target.setDataAndType(FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".provider",file),"application/pdf");
+                target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                activity.startActivityForResult(target,101);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
+
     }
+
 
 
 }

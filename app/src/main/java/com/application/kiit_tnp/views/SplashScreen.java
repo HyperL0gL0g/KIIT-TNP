@@ -2,6 +2,7 @@ package com.application.kiit_tnp.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +29,7 @@ import okhttp3.Response;
 
 public class SplashScreen extends AppCompatActivity {
 
+    Activity activity = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,18 +39,22 @@ public class SplashScreen extends AppCompatActivity {
         Cursor c = dbread.rawQuery("select * from sessionID",null);
         if(c.getCount()==1){
             if (c.moveToFirst()) {
-                new asyTask.get_notice(getApplicationContext()).execute(c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), "JUNK");
+                new asyTask.get_notice(getApplicationContext(),activity).execute(c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), "JUNK");
+
             }
         }else{
             Cursor credsCursor = dbread.rawQuery("select * from users",null);
             if(credsCursor.getCount()==1){
                 if (credsCursor.moveToFirst()) {
-                    new asyTask.login(getApplicationContext()).execute(credsCursor.getString(1));
+                    new asyTask.login(getApplicationContext(),activity).execute(credsCursor.getString(1));
+
                 }
             }else{
                 startActivity(new Intent(getApplicationContext(),MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_HISTORY));
+
             }
         }
+        //finish();
 
     }
     private void hideSystemUI() {
