@@ -15,7 +15,7 @@
 
 - :closed_lock_with_key: **<ins>One Time Login</ins>** -  **Unlike the KIIT tnp portal , you do not have to login every time you close the app and start it again.**
 
-- :guardsman: **<ins>Privacy and Security</ins>** -  **The users user name and password will be stored only in the sqlite database in the user's devicde and nowhere else . No outsider will be able to view the credentials as the swlite databse cannot be viewed .(until the phone is rooted)**
+- :guardsman: **<ins>Privacy and Security</ins>** -  **The users user name and password will be stored only in the sqlite database in the user's devicde and nowhere else . No outsider will be able to view the credentials as the sqlite database cannot be viewed .(until the phone is rooted)**
 
 - :pushpin: **<ins>Limited Permissions</ins>** -  **The app will not have any permision other than the permission to store files in your device.**
 
