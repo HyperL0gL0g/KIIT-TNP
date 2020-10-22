@@ -34,14 +34,15 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash_screen);
         hideSystemUI();
+        new helpers().jobScheduler(getApplicationContext());
         SQLiteDatabase dbread = new dbHelper(getApplicationContext()).getReadableDatabase();
         Cursor c = dbread.rawQuery("select * from sessionID",null);
         if(c.getCount()==1){
             if (c.moveToFirst()) {
-                new asyTask.get_notice(getApplicationContext(),activity).execute(c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), "JUNK");
+                new asyTask.get_notice(getApplicationContext(),activity,false).execute(c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), "JUNK");
 
             }
         }else{
@@ -56,6 +57,7 @@ public class SplashScreen extends AppCompatActivity {
 
             }
         }
+
         //finish();
 
     }

@@ -61,9 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         }else{
                             new helpers().insertAuth(creds,dbwrite);
                             new asyTask.login(getApplicationContext(),activity).execute(creds);
-
                         }
-
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }

@@ -28,19 +28,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import okhttp3.Response;
 
 public class asyTask {
+
 
     public static class login extends AsyncTask<String,Void, JSONObject> {
         HTTPManager httpManager = new HTTPManager();
         Context context;
         Activity activity;
 
+
         public login(Context context,Activity activity) {
-            this.context = context;this.activity = activity;
+            this.context = context;
+            this.activity = activity;
         }
 
         @Override
@@ -76,7 +78,7 @@ public class asyTask {
                     c.close();
                     Cursor sessCursor = dbread.rawQuery("select * from sessionID",null);
                     if (sessCursor.moveToFirst()) {
-                        new get_notice(context,activity).execute(sessCursor.getString(5),sessCursor.getString(1),sessCursor.getString(2),sessCursor.getString(3),sessCursor.getString(4),"JUNK");
+                        new get_notice(context,activity,false).execute(sessCursor.getString(5),sessCursor.getString(1),sessCursor.getString(2),sessCursor.getString(3),sessCursor.getString(4),"JUNK");
                     }
                     sessCursor.close();
                 }else{
@@ -93,10 +95,12 @@ public class asyTask {
         HTTPManager httpManager = new HTTPManager();
         Context context;
         Activity activity;
+        boolean bg;
 
-        public get_notice(Context context,Activity activity) {
+        public get_notice(Context context,Activity activity,boolean bg) {
             this.context = context;
             this.activity = activity;
+            this.bg = bg;
         }
 
         @Override
@@ -110,21 +114,51 @@ public class asyTask {
                     }
                 }
             }else{
-                for(int i=0;i<jsonArray.length();i++){
-                    JSONObject reader = null;
-                    try {
-                        reader = jsonArray.getJSONObject(i);
-                        Log.d("testing",reader.getString("bd"));
-                        SQLiteDatabase dbwrite = new dbHelper(context).getReadableDatabase();
-                        new helpers().insertNoticeID(reader.getString("st_dt"),reader.getString("en_dt"),reader.getString("heading"),
-                                reader.getString("encrypted_notice_id"),dbwrite);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                SQLiteDatabase dbwrite = new dbHelper(context).getReadableDatabase();
+                if(bg){
+                    Cursor c = dbwrite.rawQuery("select * from noticeID order by st_dt desc",null);
+                    for(int i=0;i<jsonArray.length();i++){
+                        try {
+                            JSONObject reader = null;
+                            reader = jsonArray.getJSONObject(i);
+                            boolean checker = false;
+                            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                                if(reader.getString("encrypted_notice_id").equals(c.getString(0))){
+
+                                checker = true;
+                                }else {
+                                    Log.d("job_scheduler", "no_data_match");
+                                }
+                            }
+                        if(!checker){
+                            new helpers().notification(context,"New Notice",reader.getString("heading"));
+                        }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
+                }else{
+                    //SQLiteDatabase dbwrite = new dbHelper(context).getReadableDatabase();
+                    new helpers().deleteNoticeTable(dbwrite);
+                    for(int i=0;i<jsonArray.length();i++){
+                        JSONObject reader = null;
+                        try {
+                            reader = jsonArray.getJSONObject(i);
+                            Log.d("testing",reader.getString("bd"));
+                            new helpers().insertNoticeID(reader.getString("st_dt"),reader.getString("en_dt"),reader.getString("heading"),
+                                    reader.getString("encrypted_notice_id"),dbwrite);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    if(activity!=null){
+                        activity.finish();
+                    }
+
                 }
 
-                context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                activity.finish();
                 //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_HISTORY)
             }
         }
@@ -172,7 +206,7 @@ public class asyTask {
             super.onPostExecute(response);
             InputStream input = response.body().byteStream();
             String fileName = response.header("content-disposition").split("=")[1];
-            Log.d("Adad", fileName);
+            Log.d("fileName", fileName);
             try {
                 File mFolder = new File(Environment.getExternalStorageDirectory() + File.separator + "KIIT-TNP");
                 if (!mFolder.exists()) {
@@ -190,7 +224,7 @@ public class asyTask {
                 Intent target = new Intent(Intent.ACTION_VIEW);
                 target.setDataAndType(FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".provider",file),"application/pdf");
                 target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                activity.startActivityForResult(target,101);
+                activity.startActivity(target);
 
             } catch (Exception e) {
                 e.printStackTrace();
