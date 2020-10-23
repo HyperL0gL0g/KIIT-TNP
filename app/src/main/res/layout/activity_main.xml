@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
-                android:text="KiiT TNP"
+                android:text="KiiT-TNP"
                 android:textColor="@color/colorTextWhite"
                 android:textSize="36dp" />
 
@@ -63,21 +63,23 @@
             android:layout_centerVertical="true">
 
             <EditText
+                android:background="@drawable/edit_text_background"
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginLeft="48dp"
                 android:layout_marginRight="48dp"
-                android:background="@drawable/edit_text_background"
                 android:gravity="center"
                 android:hint="rollno@kiit.ac.in"
                 android:inputType="textEmailAddress"
                 android:paddingLeft="26dp"
                 android:paddingRight="26dp"
+                android:elevation="1dp"
                 android:textColor="@color/colorWhite"
                 android:textColorHint="@color/colorWhite" />
 
             <EditText
+                android:background="@drawable/edit_text_background"
                 android:id="@+id/password"
                 android:textColorHint="@color/colorWhite"
                 android:layout_marginTop="24dp"
@@ -86,8 +88,8 @@
                 android:textColor="@color/colorWhite"
                 android:paddingLeft="26dp"
                 android:paddingRight="26dp"
+                android:elevation="1dp"
                 android:inputType="textPassword"
-                android:background="@drawable/edit_text_background"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginLeft="48dp"
