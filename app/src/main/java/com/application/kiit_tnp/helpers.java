@@ -87,15 +87,10 @@ public class helpers {
         values.put("heading",banner);
         values.put("encrypted_notice_id",noticeid);
         database.insert("noticeID",null,values);
-//        int id = (int) database.insertWithOnConflict("noticeID", null, values, SQLiteDatabase.CONFLICT_IGNORE);
-//        if (id == -1) {
-//            database.update("noticeID", values, "encrypted_notice_id=?", new String[] {noticeid});
-//        }
     }
 
 
     public  boolean verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
         int permissionWrite = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionRead = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
 

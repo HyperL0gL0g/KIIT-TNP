@@ -152,8 +152,8 @@ public class asyTask {
                             e.printStackTrace();
                         }
                     }
-                    context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     if(activity!=null){
+                        context.startActivity(new Intent(context,mainView.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         activity.finish();
                     }
 
