@@ -63,7 +63,7 @@
             android:layout_centerVertical="true">
 
             <EditText
-                android:background="@drawable/edit_text_background"
+                android:background="@drawable/edit_text"
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
@@ -79,7 +79,7 @@
                 android:textColorHint="@color/colorWhite" />
 
             <EditText
-                android:background="@drawable/edit_text_background"
+                android:background="@drawable/edit_text"
                 android:id="@+id/password"
                 android:textColorHint="@color/colorWhite"
                 android:layout_marginTop="24dp"

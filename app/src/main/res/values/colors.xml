@@ -12,5 +12,7 @@
     <color name="colorButtonText">#ffffff</color>
     <color name="colorPlaceholder">#505050</color>
     <color name="colorTextPrimary">#0E68FF</color>
+    <color name="green">#17d059</color>
+
 
 </resources>
