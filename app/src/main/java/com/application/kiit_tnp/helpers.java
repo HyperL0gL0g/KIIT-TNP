@@ -73,6 +73,13 @@ public class helpers {
         database.update("sessionID",values,"_id=1",null);
     }
 
+    public void noticeDownLocal(String s1,String s2,SQLiteDatabase database){
+        ContentValues values = new ContentValues();
+        values.put("encrypted_notice_id",s1);
+        values.put("header",s2);
+        database.insert("noticeDown",null,values);
+    }
+
     public void insertNoticeID(String sDate,String eDate,String banner,String noticeid,SQLiteDatabase database){
         ContentValues values = new ContentValues();
         values.put("st_dt",sDate);

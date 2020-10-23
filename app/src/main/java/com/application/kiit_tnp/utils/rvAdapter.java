@@ -2,8 +2,11 @@ package com.application.kiit_tnp.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +15,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.application.kiit_tnp.BuildConfig;
 import com.application.kiit_tnp.HTTPManager;
 import com.application.kiit_tnp.R;
 import com.application.kiit_tnp.db.dbHelper;
 import com.application.kiit_tnp.helpers;
 
+import java.io.File;
 import java.util.List;
 
 public class rvAdapter extends RecyclerView.Adapter<rvAdapter.viewHolder>{
@@ -56,15 +62,37 @@ public class rvAdapter extends RecyclerView.Adapter<rvAdapter.viewHolder>{
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"Starting download", Toast.LENGTH_SHORT).show();
+
                 if (new helpers().verifyStoragePermissions(activity)){
                     SQLiteDatabase dbread = new dbHelper(context).getReadableDatabase();
-                    Cursor c = dbread.rawQuery("select * from sessionID",null);
-                    if (c.moveToFirst()) {
-                        //mdata.add(new dataObj("Posted on "+c.getString(1),"Expires on "+c.getString(2),c.getString(3),c.getString(0)));
-                        new asyTask.getNoticeDown(activity).execute(new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()});
-                        //new helpers().checkDownload(activity,new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()},mdata.get(position).getNoticeID());
+                    File mFolder = new File(Environment.getExternalStorageDirectory() + File.separator + "KIIT-TNP");
+                    File directory = new File(mFolder.getAbsolutePath());
+                    File[] files = directory.listFiles();
+                    Cursor cursor = dbread.rawQuery("select * from noticeDown where encrypted_notice_id = ?",new String[] {mdata.get(position).getNoticeID()});
+                    boolean checker = false;
+                    int index = 0;
+                    if(cursor.getCount()>0){
+                        cursor.moveToFirst();
+                        for(int i=0;i<files.length;i++){
+                            if(files[i].getName().equals(cursor.getString(2))){
+                                checker=true;
+                                index = i;
+                            }
+                        }
                     }
+                    if(checker){
+                        Intent target = new Intent(Intent.ACTION_VIEW);
+                        target.setDataAndType(FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".provider", new File(files[index].getAbsolutePath())),"application/pdf");
+                        target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        activity.startActivity(target);
+                    }else{
+                        Cursor c = dbread.rawQuery("select * from sessionID",null);
+                        if (c.moveToFirst()) {
+                            Toast.makeText(context,"Starting download", Toast.LENGTH_SHORT).show();
+                            new asyTask.getNoticeDown(activity).execute(new String[]{c.getString(5), c.getString(1), c.getString(2), c.getString(3), c.getString(4), mdata.get(position).getNoticeID()});
+                        }
+                    }
+
                 }
             }
         });

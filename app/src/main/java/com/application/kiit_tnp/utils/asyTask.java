@@ -186,6 +186,7 @@ public class asyTask {
 
         HTTPManager httpManager = new HTTPManager();
         Activity activity;
+        String noticeID=null;
         public getNoticeDown(Activity activity) {
             this.activity = activity;
         }
@@ -194,6 +195,7 @@ public class asyTask {
         protected Response doInBackground(String... strings) {
             try {
                 Response response = httpManager.getNoticeDown("https://apiv3.kiittnp.in/api/1.2/connect/notice/downlaod",strings);
+                this.noticeID = strings[5];
                 return  response;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -221,6 +223,7 @@ public class asyTask {
                         output.write(buffer, 0, read);
                     }
                 output.flush();
+                new helpers().noticeDownLocal(noticeID,fileName,new dbHelper(activity).getWritableDatabase());
                 Intent target = new Intent(Intent.ACTION_VIEW);
                 target.setDataAndType(FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + ".provider",file),"application/pdf");
                 target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
