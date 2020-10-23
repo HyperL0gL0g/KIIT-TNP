@@ -31,7 +31,7 @@
 ## :dart: Requirements:
 
 - Android Smart-Phone :iphone:
-- Minimum Android API 19 - Android Kit-Kat.
+- Minimum Android API 23 - Android Marshmallow.
  ---
 <br/><br/>
 
